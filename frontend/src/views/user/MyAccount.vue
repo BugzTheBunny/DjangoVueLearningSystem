@@ -15,6 +15,9 @@
 import axios from "axios";
 export default {
   name: "MyAccount",
+  mounted() {
+    document.title = "StudyNet | My Account";
+  },
   methods: {
     async logout() {
       await axios

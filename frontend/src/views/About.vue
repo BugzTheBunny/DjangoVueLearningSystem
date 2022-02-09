@@ -9,3 +9,11 @@
     <section class="section">This is the about page</section>
   </div>
 </template>
+<script>
+export default {
+  name: "About",
+  mounted() {
+    document.title = "StudyNet | About";
+  },
+};
+</script>

@@ -3,7 +3,17 @@ import imp
 from pyexpat import model
 from rest_framework import serializers
 
-from .models import Course, Lesson
+from .models import Course, Lesson, Comment, Category
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = (
+            'id',
+            'title',
+            'slug'
+        )
 
 
 class CourseListSerializer(serializers.ModelSerializer):
@@ -14,7 +24,8 @@ class CourseListSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'slug',
-            'short_description'
+            'short_description',
+            'get_image'
         )
 
 
@@ -40,4 +51,15 @@ class LessonListSerializer(serializers.ModelSerializer):
             'slug',
             'short_description',
             'long_description'
+        )
+
+
+class CommentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = (
+            'id',
+            'name',
+            'content',
+            'created_at'
         )

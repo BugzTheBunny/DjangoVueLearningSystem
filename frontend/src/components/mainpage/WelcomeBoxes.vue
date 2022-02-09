@@ -38,9 +38,12 @@
         </div>
       </div>
       <div class="column is-12 has-text-centered">
-        <a href="" class="button is-start-btn is-size-3 mt-6 mb-6">
-          Click here to start
-        </a>
+        <router-link
+          :to="{ name: 'SignUp' }"
+          class="button is-start-btn is-size-3 mt-6 mb-6"
+        >
+          Click here to start</router-link
+        >
       </div>
     </div>
   </div>
@@ -49,6 +52,5 @@
 <script>
 export default {
   name: "WelcomeBoxes",
-  methods: {},
 };
 </script>
