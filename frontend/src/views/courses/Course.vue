@@ -23,59 +23,111 @@
               <template v-if="activeLesson">
                 <h1 class="is-2">{{ activeLesson.title }}</h1>
                 <h4 class="is-4">{{ activeLesson.long_description }}</h4>
+                <hr />
+                <template v-if="activeLesson.lesson_type === 'quiz'">
+                  <h3>{{ quiz.question }}</h3>
+
+                  <div class="control">
+                    <label class="radio">
+                      <input
+                        type="radio"
+                        :value="quiz.option1"
+                        v-model="selectedAnswer"
+                      />
+                      {{ quiz.option1 }}
+                    </label>
+                  </div>
+                  <div class="control">
+                    <label class="radio">
+                      <input
+                        type="radio"
+                        :value="quiz.option2"
+                        v-model="selectedAnswer"
+                      />
+                      {{ quiz.option2 }}
+                    </label>
+                  </div>
+                  <div class="control">
+                    <label class="radio">
+                      <input
+                        type="radio"
+                        :value="quiz.option3"
+                        v-model="selectedAnswer"
+                      />
+                      {{ quiz.option3 }}
+                    </label>
+                  </div>
+                  <div class="control">
+                    <label class="radio">
+                      <input
+                        type="radio"
+                        :value="quiz.option4"
+                        v-model="selectedAnswer"
+                      />
+                      {{ quiz.option4 }}
+                    </label>
+                  </div>
+                  <div class="control mt-4">
+                    <button class="button is-info" @click="submitQuiz">
+                      Submit
+                    </button>
+                  </div>
+                </template>
+
+                <template v-if="activeLesson.lesson_type === 'article'">
+                  <article
+                    class="media box is-info"
+                    v-for="comment in comments"
+                    v-bind:key="comment.id"
+                  >
+                    <div class="media-content">
+                      <div class="content">
+                        <strong>{{ comment.name }} </strong>
+                        {{ comment.created_at }} <br />
+
+                        {{ comment.content }}
+                      </div>
+                    </div>
+                  </article>
+
+                  <form @submit.prevent="submitComment()">
+                    <div class="field">
+                      <label class="label">Name</label>
+                      <div class="control">
+                        <input
+                          type="text"
+                          class="input"
+                          v-model="comment.name"
+                        />
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label class="label">Comment</label>
+                      <div class="control">
+                        <textarea
+                          type="textarea"
+                          class="textarea"
+                          v-model="comment.content"
+                        />
+                      </div>
+                    </div>
+
+                    <div
+                      class="notification is-danger"
+                      v-for="error in errors"
+                      v-bind:key="error"
+                    >
+                      {{ error }}
+                    </div>
+
+                    <div class="field">
+                      <div class="control">
+                        <button class="button is-link">Leave comment</button>
+                      </div>
+                    </div>
+                  </form>
+                </template>
               </template>
-              <template v-else>
-                <h4 class="is-4">{{ course.long_description }}</h4>
-              </template>
-              <hr />
-
-              <article
-                class="media box is-info"
-                v-for="comment in comments"
-                v-bind:key="comment.id"
-              >
-                <div class="media-content">
-                  <div class="content">
-                    <strong>{{ comment.name }} </strong>
-                    {{ comment.created_at }} <br />
-
-                    {{ comment.content }}
-                  </div>
-                </div>
-              </article>
-
-              <form @submit.prevent="submitComment()">
-                <div class="field">
-                  <label class="label">Name</label>
-                  <div class="control">
-                    <input type="text" class="input" v-model="comment.name" />
-                  </div>
-                </div>
-                <div class="field">
-                  <label class="label">Comment</label>
-                  <div class="control">
-                    <textarea
-                      type="textarea"
-                      class="textarea"
-                      v-model="comment.content"
-                    />
-                  </div>
-                </div>
-
-                <div
-                  class="notification is-danger"
-                  v-for="error in errors"
-                  v-bind:key="error"
-                >
-                  {{ error }}
-                </div>
-
-                <div class="field">
-                  <div class="control">
-                    <button class="button is-link">Leave comment</button>
-                  </div>
-                </div>
-              </form>
             </template>
             <template v-else>
               <h2>Restricted access</h2>
@@ -100,6 +152,9 @@ export default {
       comments: [],
       errors: [],
       activeLesson: null,
+      quiz: {},
+      selectedAnswer: "",
+      quizResult: null,
       comment: {
         name: "",
         content: "",
@@ -125,6 +180,7 @@ export default {
   },
   methods: {
     getComments() {
+      this.quiz = {};
       axios
         .get(
           `/api/v1/courses/${this.course.slug}/${this.activeLesson.slug}/get-comments/`
@@ -136,10 +192,47 @@ export default {
     },
     setActiveLesson(lesson) {
       this.activeLesson = lesson;
-
-      this.getComments();
+      if (lesson.lesson_type === "quiz") {
+        this.getQuiz();
+      } else {
+        this.getComments();
+      }
     },
+    getQuiz() {
+      axios
+        .get(
+          `/api/v1/courses/${this.course.slug}/${this.activeLesson.slug}/get-quiz/`
+        )
+        .then((response) => {
+          console.log(response.data);
 
+          this.quiz = response.data;
+        });
+    },
+    submitQuiz() {
+      this.quizResult = null;
+      this.selectedAnswer
+        ? this.selectedAnswer === this.quiz.answer
+          ? (this.quizResult = "correct")
+          : (this.quizResult = "wrong")
+        : toast({
+            message: "Select at option first!",
+            type: "is-link",
+            dismissible: true,
+            pauseOnHover: true,
+            duration: 2000,
+            position: "bottom-right",
+          });
+      toast({
+        message: this.quizResult,
+        type: "is-link",
+        dismissible: true,
+        pauseOnHover: true,
+        duration: 2000,
+        position: "bottom-right",
+      });
+      console.log(this.quizResult);
+    },
     submitComment() {
       this.errors = [];
 

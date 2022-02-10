@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Course, Lesson, Comment
+from .models import Category, Course, Lesson, Comment, Quiz
 
 
 # The inline thing, will take all comments that are related to the id of lesson
@@ -18,6 +18,7 @@ class LessonAdmin(admin.ModelAdmin):
     inlines = [LessonCommentInline]  # Will implement the inline
 
 
+admin.site.register(Quiz)
 admin.site.register(Category)
 admin.site.register(Course)
 admin.site.register(Lesson, LessonAdmin)

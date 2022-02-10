@@ -74,3 +74,17 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         User, related_name='comments', on_delete=models.CASCADE)
+
+
+class Quiz(models.Model):
+    lesson = models.ForeignKey(
+        Lesson, related_name='quizzes', on_delete=models.CASCADE)
+    question = models.CharField(max_length=200, null=True)
+    answer = models.CharField(max_length=200, null=True)
+    option1 = models.CharField(max_length=200, null=True)
+    option2 = models.CharField(max_length=200, null=True)
+    option3 = models.CharField(max_length=200, null=True)
+    option4 = models.CharField(max_length=200, null=True)
+
+    class Meta:
+        verbose_name_plural = 'Quizzes'
